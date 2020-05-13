@@ -3,7 +3,12 @@ import ReactDOM from 'react-dom'
 
 const App = (props) => {
   const [selected, setSelected] = useState(0)
+  const [votes, setVotes] = useState(
+    new Array(props.anecdotes.length).fill(0)
+  )
+  const [popular, setPopular] = useState(0)
 
+  //Generate new value for selected
   const genRandom = (original, length) => {
     let fresh = Math.floor(Math.random()*length)
     while (original === fresh) {
@@ -12,18 +17,46 @@ const App = (props) => {
     return fresh
   }
 
+  //Handle when random button is clicked
   const handleRandomClick = () => {
     setSelected(genRandom(selected, props.anecdotes.length))
   }
 
+  //Handle when vote button clicked
+  const handleVoteClick = () => {
+    //Update votes array
+    let copy = votes
+    copy[selected]++
+    setVotes(copy)
+
+    //Update popular
+    if(votes[selected]>votes[popular]) {
+      setPopular(selected)
+    }
+
+    alert("Your vote was counted")
+  }
+
   return (
     <>
-    <button onClick={handleRandomClick}>
-      Generate random
-    </button>
-    <br />
-    <br />
-    {props.anecdotes[selected]}
+    <h1>Anecdote of the day</h1>
+    <div>
+      <p>{props.anecdotes[selected]}</p>
+      <p>This has {votes[selected]} votes</p>
+    </div>
+    <div>
+      <button onClick={handleRandomClick}>
+        Generate random
+      </button>
+      <button onClick={handleVoteClick}>
+        Vote
+      </button>
+    </div>
+    <h1>Anecdote with most votes</h1>
+    <div>
+      <p>{props.anecdotes[popular]}</p>
+      <p>This has {votes[popular]} votes</p>
+    </div>
     </>
   )
 }
