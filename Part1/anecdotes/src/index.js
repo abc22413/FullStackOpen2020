@@ -4,8 +4,16 @@ import ReactDOM from 'react-dom'
 const App = (props) => {
   const [selected, setSelected] = useState(0)
 
+  const genRandom = (original, length) => {
+    let fresh = Math.floor(Math.random()*length)
+    while (original === fresh) {
+      fresh = Math.floor(Math.random()*length)
+    }
+    return fresh
+  }
+
   const handleRandomClick = () => {
-    setSelected(Math.floor(Math.random()*props.anecdotes.length))
+    setSelected(genRandom(selected, props.anecdotes.length))
   }
 
   return (
@@ -13,6 +21,8 @@ const App = (props) => {
     <button onClick={handleRandomClick}>
       Generate random
     </button>
+    <br />
+    <br />
     {props.anecdotes[selected]}
     </>
   )
