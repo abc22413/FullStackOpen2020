@@ -12,17 +12,39 @@ const Button = (props) => {
 }
 
 const Statistics = (props) => {
-  let total = 0
-  total = props.raw.forEach(val => {
-    total += val
-  })
+  const total = props.raw.reduce(
+    (a,b) => a+b,
+    0
+  )
+  const avg = (props.raw[0]-props.raw[2])/total
+  const positive = ((props.raw[0])*100/total).toString()+"%"
+  if(total === 0) {
+    return (
+      <>
+      <p>No feedback given</p>
+      </>
+    )
+  }
   return (
-    <>
-      <p>Good: {props.raw[0]}</p>
-      <p>Neutral: {props.raw[1]}</p>
-      <p>Bad: {props.raw[2]}</p>
-      <p>All: {total}</p>
-    </>
+  <table>
+    <tbody>
+    <Statistic text="Good" value={props.raw[0]} />
+    <Statistic text="Neutral" value={props.raw[1]} />
+    <Statistic text="Bad" value={props.raw[2]} />
+    <Statistic text="All" value={total} />
+    <Statistic text="Average" value={avg} />
+    <Statistic text="Positive" value={positive} />
+    </tbody>
+  </table>
+  )
+}
+
+const Statistic = (props) => {
+  return (
+    <tr>
+      <td>{props.text}</td>
+      <td>{props.value}</td>
+    </tr>
   )
 }
 
@@ -45,6 +67,7 @@ const App = () => {
   }
 
   return (
+    <>
     <h1>give feedback</h1>
     <div>
       <Button text="good" onClick={handleGoodClick}/>
@@ -55,6 +78,7 @@ const App = () => {
     <div>
       <Statistics raw={[good,neutral,bad]}/>
     </div>
+    </>
   )
 }
 
