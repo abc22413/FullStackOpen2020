@@ -27,9 +27,14 @@ const Record = ({ person }) => {
 }
 
 const Content = (props) => {
+  const filter = props.filter.toLowerCase()
+  const persons = props.persons
+  let filteredVals = !filter ? persons : persons.filter(
+    person => person.name.toLowerCase().includes(filter) || person.number.toLowerCase().includes(filter)
+  )
   return (
     <>
-      {props.showAll.map(person => <Record key={person.name} person={person}/>)}
+      {filteredVals.map(person => <Record key={person.name} person={person}/>)}
     </>
   )
 }
@@ -39,7 +44,6 @@ const App = (props) => {
   const [newName, setNewName] = useState("")
   const [newNumber, setNewNumber] = useState("")
   const [filter, setFilter] = useState("")
-  const [showAll, setShowAll] = useState(persons)
 
   const addPerson = (event) => {
     event.preventDefault()
@@ -79,11 +83,6 @@ const App = (props) => {
 
   const handleFilterChange = (event) => {
     setFilter(event.target.value)
-    let criteria = filter.toLowerCase()
-    let filteredVals = !filter ? persons : persons.filter(
-      person => person.name.toLowerCase().includes(criteria) || person.number.toLowerCase().includes(criteria)
-    )
-    setShowAll(filteredVals)
   }
 
   return (
@@ -94,7 +93,7 @@ const App = (props) => {
     <AddPersonForm newName={newName} handleNameChange={handleNameChange} 
     newNumber={newNumber} handleNumberChange={handleNumberChange} addPerson={addPerson}/>
     <h2>Numbers</h2>
-    <Content showAll={showAll} />
+    <Content persons={persons} filter={filter}/>
     </>
   )
 }
