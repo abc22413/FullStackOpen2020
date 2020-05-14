@@ -1,42 +1,34 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
+import React from 'react';
+import ReactDOM from 'react-dom';
 
-//Header shows course name
-const Header = (props) => {
+const Header = ({ course }) => {
   return (
-    <>
-      <h1>{props.course}</h1>
-    </>
+    <h1>{course.name}</h1>
   )
 }
 
-//Content shows parts
-const Content = (props) => {
-  const parts = props.parts
-  return (
-    <>
-      <Part name={parts[0].name} num={parts[0].exercises} />
-      <Part name={parts[1].name} num={parts[1].exercises} />
-      <Part name={parts[2].name} num={parts[2].exercises} />
-    </>
-  )
+const Total = ({ course }) => {
+  const sum = course.parts[0].exercises + course.parts[1].exercises + course.parts[2].exercises
+  return(
+    <p>Number of exercises {sum}</p>
+  ) 
 }
 
-//part shows body text row
 const Part = (props) => {
   return (
-    <>
-      <p>{props.name} {props.num}</p>
-    </>
+    <p>
+      {props.part.name} {props.part.exercises}
+    </p>    
   )
 }
 
-//Total shows summary
-const Total = (props) => {
+const Content = ({ course }) => {
   return (
-    <>
-      <p>Number of exercises {props.totalnum}</p>
-    </>
+    <div>
+      <Part part={course.parts[0]} />
+      <Part part={course.parts[1]} />
+      <Part part={course.parts[2]} />
+    </div>
   )
 }
 
@@ -61,9 +53,9 @@ const App = () => {
 
   return (
     <div>
-      <Header course={course.name}/>
-      <Content parts={course.parts} />
-      <Total parts={course.parts}/>
+      <Header course={course} />
+      <Content course={course} />
+      <Total course={course} />
     </div>
   )
 }
