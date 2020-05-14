@@ -4,7 +4,8 @@ import App from './App'
 
 const persons = [
   {
-    name: "John Doe"
+    name: "John Doe",
+    number: "12-34-56789",
   },
 ]
 
