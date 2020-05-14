@@ -4,14 +4,19 @@ import Record from './components/Record'
 const App = (props) => {
   const [persons, setPersons] = useState(props.persons)
   const [newName, setNewName] = useState("")
+  const [newNumber, setNewNumber] = useState("")
 
   const addName = (event) => {
     event.preventDefault()
+    if (persons.map(person => person.name).includes(newName)) {
+      alert(`${newName} is already added to phonebook`)
+      return
+    }
     const personObject = {
-      name: event.target.value
+      name: newName,
     }
     setPersons(persons.concat(personObject))
-    //setNewName("")
+    setNewName("")
   }
 
   const handleNameChange = (event) => {
@@ -24,6 +29,7 @@ const App = (props) => {
     <form>
       <div>
         name: <input value={newName} onChange={handleNameChange}/>
+        number: <input value={newNumber}/>
       </div>
       <div>
         <button type="submit" onClick={addName}>
