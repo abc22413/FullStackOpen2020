@@ -5,7 +5,7 @@ const ShortEntry = ({ country, handler }) => {
   return (
     <div>
       <p>{country.name}</p>
-      <button onClick={handler(country.name)}>See more</button>
+      <button onClick={() => {handler(country)}}>See more</button>
     </div>
   )
 }
@@ -20,14 +20,25 @@ const Entry = ({ country }) => {
     <ul>
       {country.languages.map(lang => <li key={lang.name}>{lang.name}</li>)}
     </ul>
-    <img width="100px" height="100px" src={country.flag} alt={`Flag of ${country.name}`} />
+    <img width="auto" height="150px" src={country.flag} alt={`Flag of ${country.name}`} />
     </div>
   )
 }
 
-const Content = ({ countries, search }) => {
+const Content = (props) => {
+  const [countries, setCountries] = useState(props.countries)
+  const [focusCountry, setFocusCountry] = useState(null)
+
+  useEffect(() => {
+    if(focusCountry) {
+      setCountries([focusCountry])
+      setFocusCountry(null)
+    }
+  }
+  ,[focusCountry])
+  
   //If no search
-  if (!search) {
+  if (!props.search) {
     return (
       <>
       <p>Type a country's name to learn more</p>
@@ -50,6 +61,7 @@ const Content = ({ countries, search }) => {
       </>
     )
   }
+  //Only 1 country in countries
   else if(countries.length === 1) {
     return (
       <>
@@ -59,7 +71,7 @@ const Content = ({ countries, search }) => {
   }
   else {
     const handleSubClick = (country) => {
-      countries = [country]
+      setFocusCountry(country)
     }
     return (
       <div>
@@ -72,21 +84,19 @@ const Content = ({ countries, search }) => {
 const App = () => {
   const [search, setSearch] = useState("")
   const [countries, setCountries] = useState([])
-  const [allCountries, setAllCountries] = useState([])
 
   useEffect(
     () => {
-      axios
-      .get("https://restcountries.eu/rest/v2/all")
-      .then(response => setAllCountries(response.data))
+      if(search) {
+        axios
+        .get(`https://restcountries.eu/rest/v2/name/${search}`)
+        .then(response => setCountries(response.data))
+      }
     }
-  ,[])
+  ,[search])
 
   const handleSearchChange = (event) => {
-    let newSearch = event.target.value
-    setSearch(newSearch)
-    const filteredCountries = allCountries.filter(country => country.name.toLowerCase().includes(newSearch.toLowerCase()))
-    setCountries(filteredCountries)
+    setSearch(event.target.value)
   }
 
   return (
