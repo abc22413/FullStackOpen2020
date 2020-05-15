@@ -26,17 +26,17 @@ const Entry = ({ country }) => {
 }
 
 const Content = (props) => {
-  const [countries, setCountries] = useState(props.countries)
+  const countries = props.countries
   const [focusCountry, setFocusCountry] = useState(null)
-
-  useEffect(() => {
+  
+  /*useEffect(() => {
     if(focusCountry) {
       setCountries([focusCountry])
       setFocusCountry(null)
     }
   }
-  ,[focusCountry])
-  
+  ,[focusCountry])*/
+
   //If no search
   if (!props.search) {
     return (
