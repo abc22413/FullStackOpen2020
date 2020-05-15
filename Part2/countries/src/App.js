@@ -1,12 +1,28 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
-const Result = () => {
-
+const ShortEntry = ({ country, handler }) => {
+  return (
+    <div>
+      <p>{country.name}</p>
+      <button onClick={handler(country.name)}>See more</button>
+    </div>
+  )
 }
 
-const Entry = () => {
-
+const Entry = ({ country }) => {
+  return (
+    <div>
+    <h1>{country.name}</h1>
+    <p>capital {country.capital}</p>
+    <p>population {country.population}</p>
+    <h2>Languages</h2>
+    <ul>
+      {country.languages.map(lang => <li key={lang.name}>{lang.name}</li>)}
+    </ul>
+    <img width="100px" height="100px" src={country.flag} alt={`Flag of ${country.name}`} />
+    </div>
+  )
 }
 
 const Content = ({ countries, search }) => {
@@ -37,15 +53,18 @@ const Content = ({ countries, search }) => {
   else if(countries.length === 1) {
     return (
       <>
-      <p>One Country found</p>
+      <Entry country={countries[0]} />
       </>
     )
   }
   else {
+    const handleSubClick = (country) => {
+      countries = [country]
+    }
     return (
-      <>
-      <p>You found {countries.length} countries</p>
-      </>
+      <div>
+      {countries.map(country => <ShortEntry key={country.name} country={country} handler={handleSubClick}/>)}
+      </div>
     )
   }
 }
