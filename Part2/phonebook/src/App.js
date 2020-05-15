@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
 
 const AddPersonForm = (props) => {
   return (
@@ -34,16 +35,23 @@ const Content = (props) => {
   )
   return (
     <>
-      {filteredVals.map(person => <Record key={person.name} person={person}/>)}
+      {filteredVals.map(person => <Record key={person.id} person={person}/>)}
     </>
   )
 }
 
-const App = (props) => {
-  const [persons, setPersons] = useState(props.persons)
+const App = () => {
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState("")
   const [newNumber, setNewNumber] = useState("")
   const [filter, setFilter] = useState("")
+
+  //Fetch data from server
+  useEffect(() => {
+    axios
+    .get("http://localhost:3001/persons")
+    .then(response => setPersons(response.data))
+  }, [])
 
   const addPerson = (event) => {
     event.preventDefault()
@@ -66,6 +74,7 @@ const App = (props) => {
     const personObject = {
       name: newName,
       number: newNumber,
+      id: persons.length + 1,
     }
     //add and reset change vars
     setPersons(persons.concat(personObject))
