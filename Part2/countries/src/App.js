@@ -26,17 +26,20 @@ const Entry = ({ country }) => {
 }
 
 const Content = (props) => {
-  const countries = props.countries
+  const [countries, setCountries] = useState([])
   const [focusCountry, setFocusCountry] = useState(null)
-  
-  /*useEffect(() => {
-    if(focusCountry) {
+
+  useEffect(() => {
+    setCountries(props.countries)
+  }, [props.countries])
+
+  useEffect(() => {
+    if (focusCountry) {
       setCountries([focusCountry])
       setFocusCountry(null)
     }
-  }
-  ,[focusCountry])*/
-
+  }, [focusCountry])
+  
   //If no search
   if (!props.search) {
     return (
@@ -84,25 +87,27 @@ const Content = (props) => {
 const App = () => {
   const [search, setSearch] = useState("")
   const [countries, setCountries] = useState([])
+  const [allCountries, setAllCountries] = useState([])
 
   useEffect(
     () => {
-      if(search) {
-        axios
-        .get(`https://restcountries.eu/rest/v2/name/${search}`)
-        .then(response => setCountries(response.data))
-      }
+      axios
+      .get("https://restcountries.eu/rest/v2/all")
+      .then(response => setAllCountries(response.data))
     }
-  ,[search])
+  ,[])
 
   const handleSearchChange = (event) => {
+    const newSearch = event.target.value
     setSearch(event.target.value)
+    const filteredCountries = allCountries.filter(country => country.name.toLowerCase().includes(newSearch.toLowerCase()))
+    setCountries(filteredCountries)
   }
 
   return (
     <>
     <div>find countries <input value={search} onChange={handleSearchChange} /></div>
-    <Content countries={countries} search={search}/>
+    <Content countries={countries} search={search} />
     </>
   )
 }
