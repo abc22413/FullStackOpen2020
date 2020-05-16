@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import personService from './services/persons'
 
 const AddPersonForm = (props) => {
   return (
@@ -19,10 +19,11 @@ const FilterForm = (props) => {
   )
 }
 
-const Record = ({ person }) => {
+const Record = ({ person, handler }) => {
   return (
     <div>
     {person.name} {person.number}
+    <button onClick={handler}>Delete</button>
     </div>
   )
 }
@@ -35,7 +36,7 @@ const Content = (props) => {
   )
   return (
     <>
-      {filteredVals.map(person => <Record key={person.id} person={person}/>)}
+      {filteredVals.map(person => <Record key={person.id} person={person} handler={handler}/>)}
     </>
   )
 }
@@ -45,12 +46,16 @@ const App = () => {
   const [newName, setNewName] = useState("")
   const [newNumber, setNewNumber] = useState("")
   const [filter, setFilter] = useState("")
+  const [filteredPersons, setFilteredPersons] = useState([])
 
   //Fetch data from server
   useEffect(() => {
-    axios
-    .get("http://localhost:3001/persons")
-    .then(response => setPersons(response.data))
+    personService
+    .getAll()
+    .then(initalPersons => {
+      setPersons(initalPersons)
+      setFilteredPersons(initalPersons)
+    })
   }, [])
 
   const addPerson = (event) => {
@@ -74,12 +79,24 @@ const App = () => {
     const personObject = {
       name: newName,
       number: newNumber,
-      id: persons.length + 1,
     }
+    //Push to server
+    personService
+    .create(personObject)
+    .then(newPerson => {
+      setPersons(persons.concat(newPerson))
+    })
+    .catch(error => {
+      alert("Creation failed, please try again")
+    })
     //add and reset change vars
-    setPersons(persons.concat(personObject))
     setNewName("")
     setNewNumber("")
+  }
+
+  const rmvPerson = (id) => {
+    const person = persons.find(n => n.id === id)
+    window.confirm(`Confirm deletion of ${person.name} ?`)
   }
 
   const handleNameChange = (event) => {
@@ -89,6 +106,11 @@ const App = () => {
   const handleNumberChange = (event) => {
     setNewNumber(event.target.value)
   }
+
+  useEffect(() => {
+    const filterVal = filter.toLowerCase()
+    setFilteredPersons(persons.filter(person => person.name.toLowerCase().includes(filterVal) || person.number.toLowerCase().includes(filterVal)))
+  },[filter, persons])
 
   const handleFilterChange = (event) => {
     setFilter(event.target.value)
@@ -102,7 +124,7 @@ const App = () => {
     <AddPersonForm newName={newName} handleNameChange={handleNameChange} 
     newNumber={newNumber} handleNumberChange={handleNumberChange} addPerson={addPerson}/>
     <h2>Numbers</h2>
-    <Content persons={persons} filter={filter}/>
+    {filteredPersons.map(person => <Record person={person} handler={() => rmvPerson(person.id)} />)}
     </>
   )
 }
