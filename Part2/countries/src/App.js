@@ -15,17 +15,23 @@ const Entry = ({ country }) => {
     main: {
       temp: NaN
     },
-    weather: {
-      icon: "01d",
-      description: "NaN"
+    wind: {
+      speed: NaN,
+      deg: NaN,
     },
+    weather: [{
+      icon: "01d",
+      description: "NaN",
+      
+    }],
   })
 
   useEffect(() => {
     axios
     .get(`http://api.openweathermap.org/data/2.5/weather?q=${country.capital}&APPID=${process.env.REACT_APP_API_KEY}`)
     .then(response => setWeather(response.data))
-  })
+  },[country.capital])
+  console.log(weather)
   return (
     <div>
     <h1>{country.name}</h1>
@@ -35,11 +41,12 @@ const Entry = ({ country }) => {
     <ul>
       {country.languages.map(lang => <li key={lang.name}>{lang.name}</li>)}
     </ul>
-    <img width="auto" height="150px" src={country.flag} alt={`Flag of ${country.name}`} />
+    <img width="auto" height="100px" src={country.flag} alt={`Flag of ${country.name}`} />
     <h2>Weather in {country.capital}</h2>
-    <p><strong>Temperature</strong> {weather.main.temp-273.15} {"\u2103"}</p>
-    <img src={`http://openweathermap.org/img/w/${weather.weather.icon}.png`} alt={weather.weather.description} />
-    <p><strong>Wind</strong> </p>
+    <p><strong>Temperature</strong> {Math.round((weather.main.temp-273.15)*10/10)} {"\u2103"}</p>
+    <img src={`http://openweathermap.org/img/w/${weather.weather[0].icon}.png`} alt={weather.weather[0].description} />
+    <p><em>{weather.weather[0].description}</em></p>
+    <p><strong>Wind</strong> {weather.wind.speed*3.6}km/h @ {weather.wind.deg} degrees</p>
     </div>
   )
 }
