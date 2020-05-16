@@ -28,19 +28,6 @@ const Record = ({ person, handler }) => {
   )
 }
 
-const Content = (props) => {
-  const filter = props.filter.toLowerCase()
-  const persons = props.persons
-  let filteredVals = !filter ? persons : persons.filter(
-    person => person.name.toLowerCase().includes(filter) || person.number.toLowerCase().includes(filter)
-  )
-  return (
-    <>
-      {filteredVals.map(person => <Record key={person.id} person={person} handler={handler}/>)}
-    </>
-  )
-}
-
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState("")
@@ -54,10 +41,10 @@ const App = () => {
     .getAll()
     .then(initalPersons => {
       setPersons(initalPersons)
-      setFilteredPersons(initalPersons)
     })
   }, [])
 
+  //Add person code
   const addPerson = (event) => {
     event.preventDefault()
     //if a field is blank
@@ -94,9 +81,19 @@ const App = () => {
     setNewNumber("")
   }
 
+  //Delete person code
   const rmvPerson = (id) => {
     const person = persons.find(n => n.id === id)
-    window.confirm(`Confirm deletion of ${person.name} ?`)
+    if (!window.confirm(`Confirm deletion of ${person.name} ?`)) return
+    personService
+    .remove(id)
+    .then(() => {
+      setPersons(persons.filter(person => person.id !== id))
+    })
+    .catch(error => {
+      alert(`The person '${person.name}' has already been deleted`)
+      setPersons(persons.filter(person => person.id !== id))
+    })
   }
 
   const handleNameChange = (event) => {
@@ -107,7 +104,12 @@ const App = () => {
     setNewNumber(event.target.value)
   }
 
+  //Update filteredPersons when filter or persons changes
   useEffect(() => {
+    if (!filter) {
+      setFilteredPersons(persons)
+      return
+    }
     const filterVal = filter.toLowerCase()
     setFilteredPersons(persons.filter(person => person.name.toLowerCase().includes(filterVal) || person.number.toLowerCase().includes(filterVal)))
   },[filter, persons])
@@ -124,7 +126,7 @@ const App = () => {
     <AddPersonForm newName={newName} handleNameChange={handleNameChange} 
     newNumber={newNumber} handleNumberChange={handleNumberChange} addPerson={addPerson}/>
     <h2>Numbers</h2>
-    {filteredPersons.map(person => <Record person={person} handler={() => rmvPerson(person.id)} />)}
+    {filteredPersons.map(person => <Record key={person.id} person={person} handler={() => rmvPerson(person.id)} />)}
     </>
   )
 }
