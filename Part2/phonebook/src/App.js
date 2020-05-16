@@ -54,7 +54,22 @@ const App = () => {
     }
     //if name already inserted
     if (persons.map(person => person.name).includes(newName)) {
-      alert(`${newName} is already added to phonebook`)
+      if (!window.confirm(`${newName} is already added to phonebook. Replace old number with a new one?`)) return
+      const oldPerson = persons.find(n => n.name === newName)
+      const newPerson = {
+        ...oldPerson,
+        number: newNumber
+      }
+      personService
+      .update(oldPerson.id, newPerson)
+      .then(updatedPerson => {
+        setPersons(persons.map(person => person.name !== newName ? person : updatedPerson))
+      })
+      .catch(error => {
+        alert("Creation failed, please try again.")
+      })
+      setNewName("")
+      setNewNumber("")
       return
     }
     //if number already exists
