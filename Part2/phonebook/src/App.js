@@ -28,12 +28,37 @@ const Record = ({ person, handler }) => {
   )
 }
 
+const Notification = ({ message, good }) => {
+  let NotifStyle = {
+    color: "green",
+    background: "lightgrey",
+    fontSize: 20,
+    borderStyle: "solid",
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  }
+  if(!message)return null
+  if(!good) {
+    NotifStyle.color = "red"
+  }
+  else if (good === true){
+    NotifStyle.color = "green"
+  }
+  return (
+    <div style={NotifStyle}>
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState("")
   const [newNumber, setNewNumber] = useState("")
   const [filter, setFilter] = useState("")
   const [filteredPersons, setFilteredPersons] = useState([])
+  const [errorMessage, setErrorMessage] = useState([null, true])
 
   //Fetch data from server
   useEffect(() => {
@@ -49,7 +74,10 @@ const App = () => {
     event.preventDefault()
     //if a field is blank
     if (!newName || !newNumber) {
-      alert("Please fill in all fields!")
+      setErrorMessage(["Please fill in all blanks!",false])
+      setTimeout(() => {
+        setErrorMessage([null,"false"])
+      }, 5000)
       return
     }
     //if name already inserted
@@ -64,9 +92,17 @@ const App = () => {
       .update(oldPerson.id, newPerson)
       .then(updatedPerson => {
         setPersons(persons.map(person => person.name !== newName ? person : updatedPerson))
+        setErrorMessage([`${newName}'s number succesfully updated`, true])
+        setTimeout(() => {
+          setErrorMessage([null, false])
+        }, 5000)
       })
       .catch(error => {
-        alert("Creation failed, please try again.")
+        setErrorMessage([`Update failed, ${newName} was already deleted`, false])
+        setPersons(persons.filter(person => person.name !== newName))
+        setTimeout(() => {
+          setErrorMessage([null, false])
+        }, 5000)
       })
       setNewName("")
       setNewNumber("")
@@ -74,7 +110,10 @@ const App = () => {
     }
     //if number already exists
     if (persons.map(person => person.number).includes(newNumber)) {
-      alert(`${newNumber} is already added to phonebook`)
+      setErrorMessage([`${newNumber} is already added to phonebook`, false])
+      setTimeout(() => {
+        setErrorMessage([null, false])
+      }, 5000)
       return
     }
     //create person object
@@ -87,9 +126,16 @@ const App = () => {
     .create(personObject)
     .then(newPerson => {
       setPersons(persons.concat(newPerson))
+      setErrorMessage([`${newPerson.name} succesfully added`,true])
+      setTimeout(() => {
+        setErrorMessage([null, false])
+      }, 5000)
     })
     .catch(error => {
-      alert("Creation failed, please try again")
+      setErrorMessage(["Creation failed, please try again", false])
+      setTimeout(() => {
+        setErrorMessage([null, false])
+      }, 5000)
     })
     //add and reset change vars
     setNewName("")
@@ -104,10 +150,17 @@ const App = () => {
     .remove(id)
     .then(() => {
       setPersons(persons.filter(person => person.id !== id))
+      setErrorMessage([`Successfully deleted ${person.name}`,true])
+      setTimeout(() => {
+        setErrorMessage([null, false])
+      }, 5000)
     })
     .catch(error => {
-      alert(`The person '${person.name}' has already been deleted`)
+      setErrorMessage([`The person '${person.name}' has already been deleted`,false])
       setPersons(persons.filter(person => person.id !== id))
+      setTimeout(() => {
+        setErrorMessage([null, false])
+      }, 5000)
     })
   }
 
@@ -136,6 +189,7 @@ const App = () => {
   return (
     <>
     <h2>Phonebook</h2>
+    <Notification message={errorMessage[0]} good={errorMessage[1]}/>
     <FilterForm flter={filter} handleFilterChange={handleFilterChange}/>
     <h2>Add a new</h2>
     <AddPersonForm newName={newName} handleNameChange={handleNameChange} 
