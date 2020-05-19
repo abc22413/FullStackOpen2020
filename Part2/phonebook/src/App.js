@@ -98,7 +98,7 @@ const App = () => {
         }, 5000)
       })
       .catch(error => {
-        setErrorMessage([`Update failed, ${newName} was already deleted`, false])
+        setErrorMessage([error.response.data.error, false])
         setPersons(persons.filter(person => person.name !== newName))
         setTimeout(() => {
           setErrorMessage([null, false])
@@ -116,6 +116,7 @@ const App = () => {
       }, 5000)
       return
     }
+    
     //create person object
     const personObject = {
       name: newName,
@@ -132,7 +133,7 @@ const App = () => {
       }, 5000)
     })
     .catch(error => {
-      setErrorMessage(["Creation failed, please try again", false])
+      setErrorMessage([error.response.data.error, false])
       setTimeout(() => {
         setErrorMessage([null, false])
       }, 5000)
